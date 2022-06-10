@@ -2,6 +2,7 @@ package se.b3.healthtech.blackbird.blbcontent.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.Data;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import se.b3.healthtech.blackbird.blbcontent.api.request.CreateContentRequest;
 import se.b3.healthtech.blackbird.blbcontent.service.ContentService;
+
+import java.util.List;
 
 @Slf4j
 @Data
@@ -27,11 +30,29 @@ public class ContentController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully created a text block", content = {@Content}),
             @ApiResponse(responseCode = "404", description = "Object not found", content = {@Content}),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})   })
-    @PostMapping(value= "/")
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})})
+    @PostMapping(value = "/")
     @ResponseStatus(value = HttpStatus.OK)
-    public void createContent(@RequestBody CreateContentRequest request) {
+    public void createContent(@RequestBody CreateContentRequest request) throws CloneNotSupportedException {
+
         contentService.createContent(request);
+    }
+
+    @Operation(summary = "Get the latest content")
+    @ApiResponses(value = {
+            // Om man har en List, lägger man till @Schema
+            @ApiResponse(responseCode = "200", description = "Found content",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = se.b3.healthtech.blackbird.blbcontent.model.Content.class))}),
+            @ApiResponse(responseCode = "404", description = "Object not found", content = {@Content}),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})})
+    @GetMapping(value = "/latest/all/",
+            params = "key",
+            produces = {"application/json"})
+    @ResponseStatus(value = HttpStatus.OK)
+    public List<se.b3.healthtech.blackbird.blbcontent.model.Content> getLatestContent(@RequestParam("key") String key) {
+        log.info("ContentController - getLatestContent");
+        return contentService.getLatestContent(key);
     }
 
 }

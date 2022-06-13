@@ -48,31 +48,9 @@ public class Content extends BaseObject implements Cloneable {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public ContentType getContentType() {
-        return contentType;
-    }
-
-    public void setContentType(ContentType contentType) {
-        this.contentType = contentType;
-    }
-
-    public PublicationType getPublicationType() {
-        return publicationType;
-    }
-
-    public void setPublicationType(PublicationType publicationType) {
-        this.publicationType = publicationType;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        BaseObject cloned = (BaseObject) super.clone();
+        return cloned;
     }
 }

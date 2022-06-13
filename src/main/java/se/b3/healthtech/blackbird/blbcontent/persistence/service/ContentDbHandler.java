@@ -5,9 +5,13 @@ import org.springframework.stereotype.Service;
 import se.b3.healthtech.blackbird.blbcontent.model.Content;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.model.BatchWriteItemEnhancedRequest;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.WriteBatch;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -23,16 +27,35 @@ public class ContentDbHandler {
         this.contentTable = contentTable;
     }
 
-    public void insertContent(List<Content> publicationList){
+    public void insertContent(List<Content> contentList){
         log.info("writeContent");
         WriteBatch.Builder subBatchBuilder = WriteBatch.builder(Content.class).mappedTableResource(contentTable);
-        publicationList.forEach(subBatchBuilder::addPutItem);
+        contentList.forEach(subBatchBuilder::addPutItem);
 
         BatchWriteItemEnhancedRequest.Builder batchWriteItemEnhancedRequest = BatchWriteItemEnhancedRequest.builder();
         batchWriteItemEnhancedRequest.addWriteBatch(subBatchBuilder.build());
         dynamoDbEnhancedClient.batchWriteItem(batchWriteItemEnhancedRequest.build());
         System.out.println("done");
     }
+
+    public List<Content> getContents(String partitionKey, String versionKey) {
+
+            List<Content> contentsList = new ArrayList<>();
+
+            QueryConditional queryConditional = QueryConditional.sortBeginsWith(Key.builder()
+                    .partitionValue(partitionKey)
+                    .sortValue(versionKey)
+                    .build());
+
+            Iterator<Content> results = contentTable.query(queryConditional).items().iterator();
+
+            while (results.hasNext()) {
+                Content content = results.next();
+                contentsList.add(content);
+                log.info("ContentId: {}", content.getUuid());
+            }
+            return contentsList;
+        }
 
 }
 

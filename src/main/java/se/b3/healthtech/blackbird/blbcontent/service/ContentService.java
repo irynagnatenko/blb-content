@@ -25,11 +25,11 @@ public class ContentService {
         this.contentDbHandler = contentDbHandler;
     }
 
-    public String createContent(CreateContentRequest request) throws CloneNotSupportedException {
+    public String createContent(String key, List<Content> contentList) throws CloneNotSupportedException {
         log.info("In the content service class: init");
-        List<Content> contentList = createContentList(request.contentList(), request.partitionKey());
+        List<Content> resultContentList = createContentList(contentList, key);
 
-        contentDbHandler.insertContent(contentList);
+        contentDbHandler.insertContent(resultContentList);
 
         return null;
     }
@@ -40,6 +40,8 @@ public class ContentService {
 
         for (Content content : contentList) {
             content.setId(partitionKey);
+            content.setVersionNumber(1);
+            content.setCommitNumber(1);
             getVersionKey(content);
         }
 

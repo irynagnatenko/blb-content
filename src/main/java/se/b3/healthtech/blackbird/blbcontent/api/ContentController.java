@@ -33,9 +33,8 @@ public class ContentController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})})
     @PostMapping(value = "/")
     @ResponseStatus(value = HttpStatus.OK)
-    public void createContent(@RequestBody CreateContentRequest request) throws CloneNotSupportedException {
-
-        contentService.createContent(request);
+    public void createContent(@RequestParam String key, @RequestBody List<se.b3.healthtech.blackbird.blbcontent.model.Content> contentList) throws CloneNotSupportedException {
+        contentService.createContent(key, contentList);
     }
 
     @Operation(summary = "Get the latest content")

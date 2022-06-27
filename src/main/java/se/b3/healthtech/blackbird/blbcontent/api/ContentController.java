@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import se.b3.healthtech.blackbird.blbcontent.api.request.CreateContentRequest;
 import se.b3.healthtech.blackbird.blbcontent.service.ContentService;
 
 import java.util.List;
@@ -25,16 +24,16 @@ public class ContentController {
     public ContentController(ContentService contentService) {
         this.contentService = contentService;
     }
-
-    @Operation(summary = "Create a new text block")
+// TODO: change endpoint to add/all/
+    @Operation(summary = "Create a new list of text blocks")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully created a text block", content = {@Content}),
+            @ApiResponse(responseCode = "200", description = "Successfully created a list of text blocks", content = {@Content}),
             @ApiResponse(responseCode = "404", description = "Object not found", content = {@Content}),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})})
     @PostMapping(value = "/")
     @ResponseStatus(value = HttpStatus.OK)
-    public void createContent(@RequestParam String key, @RequestBody List<se.b3.healthtech.blackbird.blbcontent.model.Content> contentList) throws CloneNotSupportedException {
-        contentService.createContent(key, contentList);
+    public void createContentList(@RequestParam String key, @RequestBody List<se.b3.healthtech.blackbird.blbcontent.model.Content> contentList) throws CloneNotSupportedException {
+        contentService.addContentList(key, contentList);
     }
 
     @Operation(summary = "Get the latest content")
@@ -52,6 +51,17 @@ public class ContentController {
     public List<se.b3.healthtech.blackbird.blbcontent.model.Content> getLatestContent(@RequestParam("key") String key) {
         log.info("ContentController - getLatestContent");
         return contentService.getLatestContent(key);
+    }
+
+    @Operation(summary = "Create a new content block")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully created a text block", content = {@Content}),
+            @ApiResponse(responseCode = "404", description = "Object not found", content = {@Content}),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})})
+    @PostMapping(value = "/add")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void addContent(@RequestParam String key, @RequestBody se.b3.healthtech.blackbird.blbcontent.model.Content content) throws CloneNotSupportedException {
+        contentService.addContent(key, content);
     }
 
 }

@@ -68,7 +68,7 @@ public class ContentService {
     }
 
     private void setLatestVersionKey(Content content) {
-            content.setVersionKey(ContentType.CONTENT + DELIMITER + LATEST_KEY + DELIMITER + content.getUuid());
+        content.setVersionKey(ContentType.CONTENT + DELIMITER + LATEST_KEY + DELIMITER + content.getUuid());
     }
 
     private void setLatestVersionKeyContentList(List<Content> contentList) {
@@ -90,9 +90,10 @@ public class ContentService {
         Content clonedContent = (Content) content.clone();
         return clonedContent;
     }
+
     public List<Content> getLatestContent(String key) {
         log.info("ContentService - getLatestContent");
-        String versionKey = ContentType.CONTENT.name()+ DELIMITER + LATEST_KEY;
+        String versionKey = ContentType.CONTENT.name() + DELIMITER + LATEST_KEY;
         return contentDbHandler.getContents(key, versionKey);
     }
 
@@ -112,15 +113,4 @@ public class ContentService {
         contentDbHandler.insertContent(newContentObjects);
     }
 
-    // Implementation av metoden AddContent i ContentService-klassen.
-    //ParameterLista till AddContent-metoden (String key, Content content)
-    //Skapa upp en array av Contents
-    //Utöka content-objektet med
-        //partitionskey
-        //versionkey
-        //CommitNr
-        //VersionNr
-    //Clona contentObjektet och sätt versionKey till en LatestKey
-    //Lägg in contentObjekten och arrayListan
-    //Anropa dbHandler för att skriva ner de båda objekten till databasen
 }

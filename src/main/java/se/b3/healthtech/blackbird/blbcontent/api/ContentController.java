@@ -63,4 +63,22 @@ public class ContentController {
         contentService.addContent(key, content);
     }
 
+    /*
+    @Operation(summary = "Get the latest content for a specific partitionKey")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found content object",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = se.b3.healthtech.blackbird.blbcontent.model.Content.class))}),
+            @ApiResponse(responseCode = "404", description = "Object not found", content = {@Content}),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})})
+    @GetMapping(value = "/",
+            params = {"key", "ContentId"},
+            produces = {"application/json"})
+    @ResponseStatus(value = HttpStatus.OK)
+    public Content getContent(@RequestParam("key") String key, @RequestParam("contentId") String contentId) {
+        log.info("in ContentController - getContent");
+        return contentService.getcontent(key, contentId);
+    }
+
+     */
 }

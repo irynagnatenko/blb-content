@@ -1,6 +1,7 @@
 package se.b3.healthtech.blackbird.blbcontent.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import se.b3.healthtech.blackbird.blbcontent.enums.HeaderType;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 import javax.validation.constraints.NotNull;

@@ -15,8 +15,8 @@ import java.util.List;
 public class ContentService {
 
     private static final String DELIMITER = "#";
-
     private static final String LATEST_KEY = "LATEST";
+    private static final String DELETED_KEY = "DELETED";
 
     private final ContentDbHandler contentDbHandler;
 
@@ -67,9 +67,7 @@ public class ContentService {
                         content.getVersionNumber() + DELIMITER + "C" + content.getCommitNumber());
     }
 
-    private void setLatestVersionKey(Content content) {
-        content.setVersionKey(ContentType.CONTENT + DELIMITER + LATEST_KEY + DELIMITER + content.getUuid());
-    }
+
 
     private void setLatestVersionKeyContentList(List<Content> contentList) {
         for (Content content : contentList) {
@@ -92,12 +90,25 @@ public class ContentService {
     }
 
     public List<Content> getLatestContent(String key) {
-        log.info("ContentService - getLatestContent");
+        log.info("ContentService - getLatestContent List");
         String versionKey = ContentType.CONTENT.name() + DELIMITER + LATEST_KEY;
         return contentDbHandler.getContents(key, versionKey);
     }
 
+    public Content getContent(String publicationId, String contentId) {
+        log.info("ContentService - getLatestContent one object");
+        //Skapa upp ett LATEST-versionKey med angivet contentId
+        String versionKey = ContentType.CONTENT.name() + DELIMITER + LATEST_KEY + DELIMITER + contentId;
+        //Anropa befintlig metod - GetContents i ContentDBHandler med parametrarna (publicationId, versionKey)
+        List<Content> latestContent = contentDbHandler.getContents(publicationId, versionKey);
+        log.info("ContentService - after getLatestContent one object");
+        //Metoden ska returnera det första objektet i listan av Contents.
+        return latestContent.get(0);
+    }
+
     public void addContent(String key, Content content) throws CloneNotSupportedException {
+        log.info("ContentService - addContent one object");
+
         List<Content> newContentObjects = new ArrayList<>();
 
         setPartitionKey(key, content);
@@ -113,10 +124,51 @@ public class ContentService {
         contentDbHandler.insertContent(newContentObjects);
     }
 
-    /*
-    public io.swagger.v3.oas.annotations.media.Content getcontent(String key, String contentId) {
+    // Denna metod ska för varje Content i listan:
+    // sätta id (publicationId), samt versionKey som ska motsvara en LATEST-versionKey med uuid för aktuellt content.
+    //Anropa delete-metoden i ContentDBHandler för varje Content-objekt i listan
+    //Skapa upp en ny versionkey enligt formatet - CompositionType#DELETED#uuid
+    //Dessutom ska ett timestamp samt userName sättas på objektet som ska skrivas ner till databasen
+    //Anropa write-metoden i ContentDBHandler för varje Content-objekt i listan
+    public void deleteContent(String userName, String publicationId, List<Content> contentList) {
+        log.info("ContentService - deleteContent");
+
+        contentToDelete(publicationId, contentList);
+        contentDbHandler.deleteContent(contentList);
+        log.info("ContentService - after delete " + contentList);
+        log.info(contentList.toString());
+
+        markAsDeleted(contentList, userName);
+        contentDbHandler.insertContent(contentList);
+        log.info("ContentService - after insert " + contentList);
+        log.info(contentList.toString());
 
     }
 
-     */
+    private void contentToDelete(String publicationId, List<Content> contentList) {
+        log.info("in the contentToDelete");
+        for (Content content : contentList) {
+            setPartitionKey(publicationId, content);
+            setLatestVersionKey(content);
+            log.info(content.getVersionKey());
+        }
+    }
+
+    private void markAsDeleted(List<Content> contentList, String userName) {
+        log.info("in the markAsDeleted");
+        for (Content content : contentList) {
+            setDeletedKey(content);
+            content.setCreatedBy(userName);
+            content.setCreated(ContentUtil.setCreatedTime());
+            log.info(content.getVersionKey());
+        }
+    }
+
+    private void setLatestVersionKey(Content content) {
+        content.setVersionKey(ContentType.CONTENT + DELIMITER + LATEST_KEY + DELIMITER + content.getUuid());
+    }
+
+    public void setDeletedKey(Content content) {
+        content.setVersionKey(ContentType.CONTENT + DELIMITER + DELETED_KEY + DELIMITER + content.getUuid());
+    }
 }

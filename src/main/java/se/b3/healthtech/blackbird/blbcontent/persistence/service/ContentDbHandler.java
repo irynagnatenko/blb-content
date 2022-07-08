@@ -27,35 +27,47 @@ public class ContentDbHandler {
         this.contentTable = contentTable;
     }
 
-    public void insertContent(List<Content> contentList){
-        log.info("writeContent");
+    public void insertContent(List<Content> contentList) {
+        log.info("DBhandler writeContent");
         WriteBatch.Builder subBatchBuilder = WriteBatch.builder(Content.class).mappedTableResource(contentTable);
         contentList.forEach(subBatchBuilder::addPutItem);
 
         BatchWriteItemEnhancedRequest.Builder batchWriteItemEnhancedRequest = BatchWriteItemEnhancedRequest.builder();
         batchWriteItemEnhancedRequest.addWriteBatch(subBatchBuilder.build());
         dynamoDbEnhancedClient.batchWriteItem(batchWriteItemEnhancedRequest.build());
-        System.out.println("done");
+        System.out.println(" writeContent done");
     }
 
     public List<Content> getContents(String partitionKey, String versionKey) {
+        log.info("ContentDBhandler - getContents");
 
-            List<Content> contentsList = new ArrayList<>();
+        List<Content> contentsList = new ArrayList<>();
 
-            QueryConditional queryConditional = QueryConditional.sortBeginsWith(Key.builder()
-                    .partitionValue(partitionKey)
-                    .sortValue(versionKey)
-                    .build());
+        QueryConditional queryConditional = QueryConditional.sortBeginsWith(Key.builder()
+                .partitionValue(partitionKey)
+                .sortValue(versionKey)
+                .build());
 
-            Iterator<Content> results = contentTable.query(queryConditional).items().iterator();
+        Iterator<Content> results = contentTable.query(queryConditional).items().iterator();
 
-            while (results.hasNext()) {
-                Content content = results.next();
-                contentsList.add(content);
-                log.info("ContentId: {}", content.getUuid());
-            }
-            return contentsList;
+        while (results.hasNext()) {
+            Content content = results.next();
+            contentsList.add(content);
+            log.info("ContentId: {}", content.getUuid());
         }
+        return contentsList;
+    }
+
+    public void deleteContent(List<Content> contentList) {
+        log.info("DBhandler - deleteContent");
+        WriteBatch.Builder subBatchBuilder = WriteBatch.builder(Content.class).mappedTableResource(contentTable);
+        contentList.forEach(subBatchBuilder::addDeleteItem);
+
+        BatchWriteItemEnhancedRequest.Builder batchWriteItemEnhancedRequest = BatchWriteItemEnhancedRequest.builder();
+        batchWriteItemEnhancedRequest.addWriteBatch(subBatchBuilder.build());
+        dynamoDbEnhancedClient.batchWriteItem(batchWriteItemEnhancedRequest.build());
+        System.out.println("deleteContent - done");
+    }
 
 }
 

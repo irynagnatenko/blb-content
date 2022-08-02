@@ -39,6 +39,8 @@ public class ContentService {
         for (Content content : contentList) {
             setPartitionKey(key, content);
             setVersionKey(content);
+            log.info("" + content.getVersionKey()); // added the original files
+
         }
 
         resultList.addAll(contentList);
@@ -72,6 +74,8 @@ public class ContentService {
     private void setLatestVersionKeyContentList(List<Content> contentList) {
         for (Content content : contentList) {
             content.setVersionKey(ContentType.CONTENT + DELIMITER + LATEST_KEY + DELIMITER + content.getUuid());
+            log.info("" + content.getVersionKey()); // added the original files
+
         }
     }
 
@@ -170,5 +174,31 @@ public class ContentService {
 
     public void setDeletedKey(Content content) {
         content.setVersionKey(ContentType.CONTENT + DELIMITER + DELETED_KEY + DELIMITER + content.getUuid());
+    }
+
+    public List<Content> getContentsByUuids(String publicationId, List<String> contentIdsList) {
+        log.info("ContentService:  getContentsByUuids" );
+        log.info("Lista " + contentIdsList.size() );
+
+        List<Content> contentList = new ArrayList<>();
+
+        for (String uuid : contentIdsList) {
+            Content content = getContentById(publicationId, uuid);
+            contentList.add(content);
+        }
+        return  contentList;
+    }
+
+    public Content getContentById(String key, String uuid) {
+        log.info("ContentService - getContent List");
+        log.info("uuid " + uuid);
+
+        String versionKey = ContentType.CONTENT.name() + DELIMITER + LATEST_KEY + DELIMITER + uuid;
+        log.info("version key " + versionKey);
+        List<Content> contents = contentDbHandler.getContents(key, versionKey);
+        log.info("Lista: " + contents.size());
+        log.info("container object" + contents.get(0));
+
+        return contents.get(0);
     }
 }

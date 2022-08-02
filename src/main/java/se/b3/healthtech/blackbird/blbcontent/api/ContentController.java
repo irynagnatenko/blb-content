@@ -97,4 +97,22 @@ public class ContentController {
         log.info("in ContentController - deleteContent");
         contentService.deleteContent(userName, publicationId, contentList);
     }
+
+    // for deleteContainer
+    @Operation(summary = "Get list of content for a specific partitionKey")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Found content objects",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = se.b3.healthtech.blackbird.blbcontent.model.Content.class))}),
+            @ApiResponse(responseCode = "404", description = "Object not found", content = {@Content}),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})})
+    @GetMapping(value = "/selected/",
+            params = {"key", "uuids"},
+            produces = {"application/json"})
+    @ResponseStatus(value = HttpStatus.OK)
+    public List<se.b3.healthtech.blackbird.blbcontent.model.Content> getContentsByUuids(@RequestParam("key") String publicationId,
+                                                                                        @RequestParam("uuids") List<String> contentIdsList) {
+        log.info("in ContentController - getContentsByUuids");
+        return contentService.getContentsByUuids(publicationId, contentIdsList);
+    }
 }

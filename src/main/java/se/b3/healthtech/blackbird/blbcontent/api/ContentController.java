@@ -59,7 +59,7 @@ public class ContentController {
             @ApiResponse(responseCode = "404", description = "Object not found", content = {@Content}),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = {@Content})})
     @PostMapping(value = "/",
-        params = "key")
+            params = "key")
     @ResponseStatus(value = HttpStatus.OK)
     public void addContent(@RequestParam("key") String key, @RequestBody se.b3.healthtech.blackbird.blbcontent.model.Content content) throws CloneNotSupportedException {
         contentService.addContent(key, content);

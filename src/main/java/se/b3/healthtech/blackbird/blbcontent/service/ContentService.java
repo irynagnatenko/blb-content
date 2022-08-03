@@ -70,7 +70,6 @@ public class ContentService {
     }
 
 
-
     private void setLatestVersionKeyContentList(List<Content> contentList) {
         for (Content content : contentList) {
             content.setVersionKey(ContentType.CONTENT + DELIMITER + LATEST_KEY + DELIMITER + content.getUuid());
@@ -128,12 +127,6 @@ public class ContentService {
         contentDbHandler.insertContent(newContentObjects);
     }
 
-    // Denna metod ska för varje Content i listan:
-    // sätta id (publicationId), samt versionKey som ska motsvara en LATEST-versionKey med uuid för aktuellt content.
-    //Anropa delete-metoden i ContentDBHandler för varje Content-objekt i listan
-    //Skapa upp en ny versionkey enligt formatet - CompositionType#DELETED#uuid
-    //Dessutom ska ett timestamp samt userName sättas på objektet som ska skrivas ner till databasen
-    //Anropa write-metoden i ContentDBHandler för varje Content-objekt i listan
     public void deleteContent(String userName, String publicationId, List<Content> contentList) {
         log.info("ContentService - deleteContent");
 
@@ -177,8 +170,8 @@ public class ContentService {
     }
 
     public List<Content> getContentsByUuids(String publicationId, List<String> contentIdsList) {
-        log.info("ContentService:  getContentsByUuids" );
-        log.info("Lista " + contentIdsList.size() );
+        log.info("ContentService:  getContentsByUuids");
+        log.info("Lista " + contentIdsList.size());
 
         List<Content> contentList = new ArrayList<>();
 
@@ -186,7 +179,7 @@ public class ContentService {
             Content content = getContentById(publicationId, uuid);
             contentList.add(content);
         }
-        return  contentList;
+        return contentList;
     }
 
     public Content getContentById(String key, String uuid) {
